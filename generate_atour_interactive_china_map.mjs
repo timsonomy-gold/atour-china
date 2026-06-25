@@ -187,7 +187,26 @@ function regionFor(city) {
   return "西北";
 }
 
-const normalRailRouteDefinitions = [
+const railRouteDefinitions = [
+  { type: "g", name: "京沪高铁", cities: ["北京", "天津", "济南", "泰安", "徐州", "宿州", "蚌埠", "滁州", "南京", "镇江", "常州", "无锡", "苏州", "上海"] },
+  { type: "g", name: "京广深高铁", cities: ["北京", "保定", "石家庄", "邢台", "邯郸", "安阳", "郑州", "许昌", "漯河", "驻马店", "信阳", "武汉", "咸宁", "岳阳", "长沙", "株洲", "衡阳", "郴州", "韶关", "广州", "深圳"] },
+  { type: "g", name: "京哈高铁", cities: ["北京", "承德", "朝阳", "阜新", "沈阳", "铁岭", "长春", "哈尔滨"] },
+  { type: "g", name: "沪昆高铁", cities: ["上海", "嘉兴", "杭州", "金华", "衢州", "上饶", "鹰潭", "南昌", "宜春", "萍乡", "长沙", "娄底", "怀化", "铜仁", "贵阳", "安顺", "曲靖", "昆明"] },
+  { type: "g", name: "沿海高铁", cities: ["大连", "营口", "盘锦", "锦州", "秦皇岛", "唐山", "天津", "沧州", "滨州", "东营", "潍坊", "青岛", "日照", "连云港", "盐城", "南通", "苏州", "上海", "嘉兴", "宁波", "台州", "温州", "宁德", "福州", "莆田", "泉州", "厦门", "漳州", "潮州", "汕头", "汕尾", "深圳", "广州"] },
+  { type: "g", name: "徐兰/兰新高铁", cities: ["连云港", "徐州", "商丘", "开封", "郑州", "洛阳", "三门峡", "渭南", "西安", "宝鸡", "天水", "兰州", "西宁", "张掖", "酒泉", "哈密", "吐鲁番", "乌鲁木齐"] },
+  { type: "g", name: "沪汉蓉快速客运通道", cities: ["上海", "苏州", "无锡", "常州", "镇江", "南京", "合肥", "六安", "武汉", "荆州", "宜昌", "恩施", "重庆", "遂宁", "成都"] },
+  { type: "g", name: "西成/成渝高铁", cities: ["西安", "汉中", "广元", "绵阳", "德阳", "成都", "资阳", "内江", "重庆"] },
+  { type: "g", name: "贵广/南广高铁", cities: ["贵阳", "黔南", "黔东南", "桂林", "贺州", "肇庆", "佛山", "广州", "南宁", "贵港", "梧州"] },
+  { type: "g", name: "成贵高铁", cities: ["成都", "眉山", "乐山", "宜宾", "昭通", "毕节", "贵阳"] },
+  { type: "d", name: "银兰动车/中兰客专", cities: ["银川", "吴忠", "中卫", "白银", "兰州"] },
+  { type: "d", name: "西中动车", cities: ["西安", "庆阳", "吴忠", "中卫"] },
+  { type: "d", name: "胶东动车圈", cities: ["济南", "淄博", "潍坊", "青岛", "烟台", "威海", "日照", "临沂"] },
+  { type: "d", name: "珠三角城际/动车", cities: ["广州", "佛山", "肇庆", "清远", "东莞", "深圳", "惠州", "汕尾", "中山", "珠海", "江门"] },
+  { type: "d", name: "东北动车圈", cities: ["大连", "营口", "鞍山", "辽阳", "沈阳", "抚顺", "本溪", "丹东", "四平", "长春", "吉林", "哈尔滨"] },
+  { type: "d", name: "海南环岛动车", cities: ["海口", "文昌", "琼海", "万宁", "三亚", "东方", "儋州"] },
+  { type: "d", name: "福建/赣南动车", cities: ["福州", "宁德", "南平", "三明", "龙岩", "厦门", "漳州", "赣州", "吉安", "南昌"] },
+  { type: "d", name: "北疆动车", cities: ["乌鲁木齐", "昌吉", "石河子", "克拉玛依", "博尔塔拉", "伊犁"] },
+  { type: "d", name: "成渝贵动车", cities: ["成都", "资阳", "内江", "自贡", "泸州", "宜宾", "遵义", "贵阳", "重庆"] },
   { type: "normal", name: "京九铁路", cities: ["北京", "衡水", "聊城", "菏泽", "商丘", "阜阳", "九江", "南昌", "吉安", "赣州", "河源", "惠州", "深圳"] },
   { type: "normal", name: "京广普速铁路", cities: ["北京", "保定", "石家庄", "邢台", "邯郸", "安阳", "郑州", "许昌", "漯河", "驻马店", "信阳", "武汉", "岳阳", "长沙", "衡阳", "郴州", "韶关", "广州"] },
   { type: "normal", name: "陇海/兰新普速铁路", cities: ["连云港", "徐州", "商丘", "开封", "郑州", "洛阳", "三门峡", "渭南", "西安", "宝鸡", "天水", "兰州", "武威", "张掖", "酒泉", "哈密", "吐鲁番", "乌鲁木齐"] },
@@ -197,11 +216,6 @@ const normalRailRouteDefinitions = [
   { type: "normal", name: "京包/包兰铁路", cities: ["北京", "张家口", "乌兰察布", "呼和浩特", "包头", "巴彦淖尔", "乌海", "银川", "中卫", "兰州"] },
   { type: "normal", name: "哈大/滨洲铁路", cities: ["哈尔滨", "大庆", "齐齐哈尔", "呼伦贝尔", "长春", "四平", "铁岭", "沈阳", "鞍山", "营口", "大连"] },
 ];
-
-const detailedRailDataPath = "rail_routes_wtrans2_20260325.json";
-const detailedRailData = fs.existsSync(detailedRailDataPath)
-  ? JSON.parse(fs.readFileSync(detailedRailDataPath, "utf8"))
-  : { source: null, routes: [] };
 
 const rows = parseCsv("atour_city_coverage_baidu_suggestion.csv");
 const baseCities = rows
@@ -225,53 +239,7 @@ for (const city of baseCities) {
 }
 
 const railTypesByCity = new Map(baseCities.map(city => [city.adcode, new Set()]));
-
-function distanceToSegment(point, a, b) {
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  if (dx === 0 && dy === 0) return Math.hypot(point.x - a.x, point.y - a.y);
-  const t = Math.max(0, Math.min(1, ((point.x - a.x) * dx + (point.y - a.y) * dy) / (dx * dx + dy * dy)));
-  return Math.hypot(point.x - (a.x + dx * t), point.y - (a.y + dy * t));
-}
-
-function markCitiesNearRoute(route, threshold = 82) {
-  if (!route.points || route.points.length < 2) return;
-  const minX = Math.min(...route.points.map(point => point.x)) - threshold;
-  const maxX = Math.max(...route.points.map(point => point.x)) + threshold;
-  const minY = Math.min(...route.points.map(point => point.y)) - threshold;
-  const maxY = Math.max(...route.points.map(point => point.y)) + threshold;
-  for (const city of baseCities) {
-    if (city.x < minX || city.x > maxX || city.y < minY || city.y > maxY) continue;
-    for (let i = 1; i < route.points.length; i++) {
-      if (distanceToSegment(city, route.points[i - 1], route.points[i]) <= threshold) {
-        railTypesByCity.get(city.adcode)?.add(route.type);
-        break;
-      }
-    }
-  }
-}
-
-const detailedRailRoutes = detailedRailData.routes
-  .map((route, index) => {
-    const points = route.coordinates
-      .map(([lon, lat]) => {
-        const [x, y] = project(lon, lat);
-        return { x: Number(x.toFixed(2)), y: Number(y.toFixed(2)) };
-      })
-      .filter(point => Number.isFinite(point.x) && Number.isFinite(point.y));
-    return {
-      id: `detail-${index}`,
-      type: route.type,
-      sourceType: route.sourceType,
-      name: route.name,
-      points,
-    };
-  })
-  .filter(route => (route.type === "g" || route.type === "d") && route.points.length >= 2);
-
-for (const route of detailedRailRoutes) markCitiesNearRoute(route);
-
-const normalRailRoutes = normalRailRouteDefinitions
+const railRoutes = railRouteDefinitions
   .map(route => {
     const seen = new Set();
     const points = route.cities
@@ -293,8 +261,6 @@ const normalRailRoutes = normalRailRouteDefinitions
   })
   .filter(route => route.points.length >= 2);
 
-const railRoutes = [...detailedRailRoutes, ...normalRailRoutes];
-
 const railTypeOrder = ["g", "d", "normal"];
 const cities = baseCities.map(city => ({
   ...city,
@@ -304,9 +270,8 @@ const cities = baseCities.map(city => ({
 const total = cities.length;
 const hubs = cities.filter(city => city.hub).length;
 const railOverlapTotal = cities.filter(city => city.railTypes.length).length;
-const detailedRailSegmentTotal = detailedRailRoutes.length;
-const detailedRailHighSpeedSegments = detailedRailRoutes.filter(route => route.type === "g").length;
-const detailedRailEmuSegments = detailedRailRoutes.filter(route => route.type === "d").length;
+const highSpeedRouteTotal = railRoutes.filter(route => route.type === "g").length;
+const emuRouteTotal = railRoutes.filter(route => route.type === "d").length;
 const provincePaths = readProvincePaths();
 const cityJson = JSON.stringify(cities);
 const railJson = JSON.stringify(railRoutes);
@@ -730,7 +695,7 @@ const html = `<!doctype html>
       <div class="hud">
         <div class="title">
           <h1>亚朵酒店覆盖城市查询图</h1>
-          <div class="subtitle">共 ${total} 个检出城市；10+ 强覆盖 ${hubs} 个；高铁/动车线段 ${detailedRailSegmentTotal.toLocaleString("zh-CN")} 段；铁路重叠 ${railOverlapTotal} 个</div>
+          <div class="subtitle">共 ${total} 个检出城市；10+ 强覆盖 ${hubs} 个；高铁/动车核验线路 ${highSpeedRouteTotal + emuRouteTotal} 条；铁路重叠 ${railOverlapTotal} 个</div>
         </div>
       </div>
       <div class="controls">
@@ -783,7 +748,7 @@ const html = `<!doctype html>
       <div class="regions" id="regions"></div>
       <div class="result-meta" id="resultMeta"></div>
       <div class="list" id="list"></div>
-      <div class="detail" id="detail">选择城市后显示覆盖等级、铁路廊道和样例门店。高铁/动车层来自 railmap.geogv.org 的 2026-03-25 公开铁路瓦片，含高铁 ${detailedRailHighSpeedSegments.toLocaleString("zh-CN")} 段、动车/快速铁路 ${detailedRailEmuSegments.toLocaleString("zh-CN")} 段；不代表实时 12306 当日车次。</div>
+      <div class="detail" id="detail">选择城市后显示覆盖等级、铁路廊道和样例门店。铁路层为按城市/车站序列绘制的旅行规划示意，高铁 ${highSpeedRouteTotal} 条、动车 ${emuRouteTotal} 条；不代表实时 12306 当日车次。</div>
     </aside>
   </main>
   <script>
