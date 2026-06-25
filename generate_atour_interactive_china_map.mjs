@@ -187,8 +187,36 @@ function regionFor(city) {
   return "西北";
 }
 
+const railRouteDefinitions = [
+  { type: "g", name: "京沪高铁", cities: ["北京", "天津", "济南", "泰安", "徐州", "宿州", "蚌埠", "滁州", "南京", "镇江", "常州", "无锡", "苏州", "上海"] },
+  { type: "g", name: "京广深港高铁", cities: ["北京", "保定", "石家庄", "邢台", "邯郸", "安阳", "郑州", "许昌", "漯河", "驻马店", "信阳", "武汉", "咸宁", "岳阳", "长沙", "株洲", "衡阳", "郴州", "韶关", "广州", "深圳"] },
+  { type: "g", name: "京哈高铁", cities: ["北京", "承德", "朝阳", "阜新", "沈阳", "铁岭", "长春", "哈尔滨"] },
+  { type: "g", name: "沪昆高铁", cities: ["上海", "嘉兴", "杭州", "金华", "衢州", "上饶", "鹰潭", "南昌", "宜春", "萍乡", "长沙", "娄底", "怀化", "铜仁", "贵阳", "安顺", "曲靖", "昆明"] },
+  { type: "g", name: "沿海高铁", cities: ["大连", "营口", "盘锦", "锦州", "秦皇岛", "唐山", "天津", "沧州", "滨州", "东营", "潍坊", "青岛", "日照", "连云港", "盐城", "南通", "苏州", "上海", "嘉兴", "宁波", "台州", "温州", "宁德", "福州", "莆田", "泉州", "厦门", "漳州", "潮州", "汕头", "汕尾", "深圳", "广州"] },
+  { type: "g", name: "徐兰/兰新高铁", cities: ["连云港", "徐州", "商丘", "开封", "郑州", "洛阳", "三门峡", "渭南", "西安", "宝鸡", "天水", "兰州", "西宁", "张掖", "酒泉", "哈密", "吐鲁番", "乌鲁木齐"] },
+  { type: "g", name: "沪汉蓉快速客运通道", cities: ["上海", "苏州", "无锡", "常州", "镇江", "南京", "合肥", "六安", "武汉", "荆州", "宜昌", "恩施", "重庆", "遂宁", "成都"] },
+  { type: "g", name: "西成/成渝高铁", cities: ["西安", "汉中", "广元", "绵阳", "德阳", "成都", "资阳", "内江", "重庆"] },
+  { type: "g", name: "贵广/南广高铁", cities: ["贵阳", "黔南", "黔东南", "桂林", "贺州", "肇庆", "佛山", "广州", "南宁", "贵港", "梧州"] },
+  { type: "g", name: "成贵高铁", cities: ["成都", "眉山", "乐山", "宜宾", "昭通", "毕节", "贵阳"] },
+  { type: "d", name: "胶东动车圈", cities: ["济南", "淄博", "潍坊", "青岛", "烟台", "威海", "日照", "临沂"] },
+  { type: "d", name: "珠三角城际/动车", cities: ["广州", "佛山", "肇庆", "清远", "东莞", "深圳", "惠州", "汕尾", "中山", "珠海", "江门"] },
+  { type: "d", name: "东北动车圈", cities: ["大连", "营口", "鞍山", "辽阳", "沈阳", "抚顺", "本溪", "丹东", "四平", "长春", "吉林", "哈尔滨"] },
+  { type: "d", name: "海南环岛动车", cities: ["海口", "文昌", "琼海", "万宁", "三亚", "东方", "儋州"] },
+  { type: "d", name: "福建/赣南动车", cities: ["福州", "宁德", "南平", "三明", "龙岩", "厦门", "漳州", "赣州", "吉安", "南昌"] },
+  { type: "d", name: "北疆动车", cities: ["乌鲁木齐", "昌吉", "石河子", "克拉玛依", "博尔塔拉", "伊犁"] },
+  { type: "d", name: "成渝贵动车", cities: ["成都", "资阳", "内江", "自贡", "泸州", "宜宾", "遵义", "贵阳", "重庆"] },
+  { type: "normal", name: "京九铁路", cities: ["北京", "衡水", "聊城", "菏泽", "商丘", "阜阳", "九江", "南昌", "吉安", "赣州", "河源", "惠州", "深圳"] },
+  { type: "normal", name: "京广普速铁路", cities: ["北京", "保定", "石家庄", "邢台", "邯郸", "安阳", "郑州", "许昌", "漯河", "驻马店", "信阳", "武汉", "岳阳", "长沙", "衡阳", "郴州", "韶关", "广州"] },
+  { type: "normal", name: "陇海/兰新普速铁路", cities: ["连云港", "徐州", "商丘", "开封", "郑州", "洛阳", "三门峡", "渭南", "西安", "宝鸡", "天水", "兰州", "武威", "张掖", "酒泉", "哈密", "吐鲁番", "乌鲁木齐"] },
+  { type: "normal", name: "沪昆普速铁路", cities: ["上海", "嘉兴", "杭州", "金华", "衢州", "上饶", "鹰潭", "南昌", "新余", "宜春", "萍乡", "株洲", "娄底", "怀化", "凯里", "贵阳", "安顺", "曲靖", "昆明"] },
+  { type: "normal", name: "成昆铁路", cities: ["成都", "眉山", "乐山", "凉山", "攀枝花", "楚雄", "昆明"] },
+  { type: "normal", name: "青藏铁路", cities: ["西宁", "海西州", "拉萨", "日喀则"] },
+  { type: "normal", name: "京包/包兰铁路", cities: ["北京", "张家口", "乌兰察布", "呼和浩特", "包头", "巴彦淖尔", "乌海", "银川", "中卫", "兰州"] },
+  { type: "normal", name: "哈大/滨洲铁路", cities: ["哈尔滨", "大庆", "齐齐哈尔", "呼伦贝尔", "长春", "四平", "铁岭", "沈阳", "鞍山", "营口", "大连"] },
+];
+
 const rows = parseCsv("atour_city_coverage_baidu_suggestion.csv");
-const cities = rows
+const baseCities = rows
   .filter(row => row.count > 0)
   .map(city => {
     const [x, y] = project(city.lon, city.lat);
@@ -202,10 +230,47 @@ const cities = rows
     };
   });
 
+const cityByRailName = new Map();
+for (const city of baseCities) {
+  cityByRailName.set(city.shortName, city);
+  cityByRailName.set(city.name, city);
+}
+
+const railTypesByCity = new Map(baseCities.map(city => [city.adcode, new Set()]));
+const railRoutes = railRouteDefinitions
+  .map(route => {
+    const seen = new Set();
+    const points = route.cities
+      .map(name => cityByRailName.get(name))
+      .filter(Boolean)
+      .filter(city => {
+        if (seen.has(city.adcode)) return false;
+        seen.add(city.adcode);
+        railTypesByCity.get(city.adcode)?.add(route.type);
+        return true;
+      })
+      .map(city => ({
+        adcode: city.adcode,
+        name: city.shortName,
+        x: city.x,
+        y: city.y,
+      }));
+    return { ...route, points };
+  })
+  .filter(route => route.points.length >= 2);
+
+const railTypeOrder = ["g", "d", "normal"];
+const cities = baseCities.map(city => ({
+  ...city,
+  railTypes: railTypeOrder.filter(type => railTypesByCity.get(city.adcode)?.has(type)),
+}));
+
 const total = cities.length;
 const hubs = cities.filter(city => city.hub).length;
+const railOverlapTotal = cities.filter(city => city.railTypes.length).length;
 const provincePaths = readProvincePaths();
 const cityJson = JSON.stringify(cities);
+const railJson = JSON.stringify(railRoutes);
 
 const html = `<!doctype html>
 <html lang="zh-CN">
@@ -223,6 +288,9 @@ const html = `<!doctype html>
       --shadow: 0 12px 32px rgba(34, 48, 38, 0.12);
       --red: #c83b36;
       --blue: #2f78b7;
+      --rail-g: #d03a35;
+      --rail-d: #2e8c62;
+      --rail-normal: #7d6a51;
     }
     * { box-sizing: border-box; }
     html { height: 100%; }
@@ -278,6 +346,29 @@ const html = `<!doctype html>
       stroke: #aebfb0;
       stroke-width: 1.8;
       vector-effect: non-scaling-stroke;
+    }
+    .rail-line {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vector-effect: non-scaling-stroke;
+      opacity: 0.62;
+      pointer-events: none;
+    }
+    .rail-line.g {
+      stroke: var(--rail-g);
+      stroke-width: 4.8;
+    }
+    .rail-line.d {
+      stroke: var(--rail-d);
+      stroke-width: 4;
+      stroke-dasharray: 12 8;
+    }
+    .rail-line.normal {
+      stroke: var(--rail-normal);
+      stroke-width: 3.2;
+      stroke-dasharray: 4 9;
+      opacity: 0.46;
     }
     .city-hit {
       cursor: pointer;
@@ -380,6 +471,29 @@ const html = `<!doctype html>
       height: 14px;
       margin: 0;
     }
+    .rail-toggles {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #dce7de;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      color: #405248;
+      font-size: 12px;
+    }
+    .rail-toggles label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+      white-space: nowrap;
+    }
+    .rail-toggles input {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+      flex: 0 0 auto;
+    }
     button, input, select { font: inherit; }
     button {
       border: 1px solid #cbd8ce;
@@ -421,6 +535,10 @@ const html = `<!doctype html>
     }
     .legend span { display: inline-flex; align-items: center; gap: 6px; }
     .dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
+    .line-key { width: 22px; height: 0; display: inline-block; border-top: 3px solid; }
+    .line-key.g { border-color: var(--rail-g); }
+    .line-key.d { border-color: var(--rail-d); border-top-style: dashed; }
+    .line-key.normal { border-color: var(--rail-normal); border-top-style: dotted; }
     .side {
       border-left: 1px solid #d8e3da;
       background: #fff;
@@ -566,13 +684,14 @@ const html = `<!doctype html>
     <section class="map-wrap">
       <svg id="map" viewBox="0 0 ${SVG_W} ${SVG_H}" aria-label="亚朵酒店覆盖城市可缩放地图">
         <g id="mapLayer">${provincePaths}</g>
+        <g id="railLayer"></g>
         <g id="cityLayer"></g>
         <g id="labelLayer"></g>
       </svg>
       <div class="hud">
         <div class="title">
           <h1>亚朵酒店覆盖城市查询图</h1>
-          <div class="subtitle">共 ${total} 个检出城市；10+ 强覆盖 ${hubs} 个，1-9 城市 ${total - hubs} 个</div>
+          <div class="subtitle">共 ${total} 个检出城市；10+ 强覆盖 ${hubs} 个；铁路廊道重叠 ${railOverlapTotal} 个</div>
         </div>
       </div>
       <div class="controls">
@@ -595,12 +714,20 @@ const html = `<!doctype html>
             <input id="showAllLabels" type="checkbox">
             强制显示全部城市名
           </label>
+          <div class="rail-toggles" id="railToggles" aria-label="铁路图层">
+            <label><input type="checkbox" value="g" checked>高铁</label>
+            <label><input type="checkbox" value="d" checked>动车</label>
+            <label><input type="checkbox" value="normal">普速</label>
+          </div>
           <button id="fitMap" class="fit-button" title="回到全国总览">适应全图</button>
         </div>
       </div>
       <div class="legend">
         <span><i class="dot" style="background:var(--red)"></i>10+ 强覆盖</span>
         <span><i class="dot" style="background:var(--blue)"></i>1-9 检出</span>
+        <span><i class="line-key g"></i>高铁</span>
+        <span><i class="line-key d"></i>动车</span>
+        <span><i class="line-key normal"></i>普速</span>
         <span>拖拽平移，滚轮缩放，搜索/筛选会显示对应城市名</span>
       </div>
     </section>
@@ -611,16 +738,18 @@ const html = `<!doctype html>
           <button class="chip active" data-scope="all">全部 ${total}</button>
           <button class="chip" data-scope="hub">10+ 强覆盖 ${hubs}</button>
           <button class="chip" data-scope="minor">1-9 城市 ${total - hubs}</button>
+          <button class="chip" data-scope="rail">铁路重叠 ${railOverlapTotal}</button>
         </div>
       </header>
       <div class="regions" id="regions"></div>
       <div class="result-meta" id="resultMeta"></div>
       <div class="list" id="list"></div>
-      <div class="detail" id="detail">选择城市后显示覆盖等级、坐标和样例门店。搜索或筛选时，对应城市名会直接显示在地图上。</div>
+      <div class="detail" id="detail">选择城市后显示覆盖等级、铁路廊道和样例门店。铁路层为干线廊道示意，适合规划高铁/动车旅行，不代表实时 12306 全量班次。</div>
     </aside>
   </main>
   <script>
     const CITIES = ${cityJson};
+    const RAIL_ROUTES = ${railJson};
     const REGIONS = [
       { name: "新疆 / 西北", extent: [72.5, 34.0, 108.5, 49.8] },
       { name: "青藏 / 川西", extent: [78.0, 26.0, 106.5, 38.8] },
@@ -639,6 +768,7 @@ const html = `<!doctype html>
     const app = document.getElementById("app");
     const svg = document.getElementById("map");
     const mapLayer = document.getElementById("mapLayer");
+    const railLayer = document.getElementById("railLayer");
     const cityLayer = document.getElementById("cityLayer");
     const labelLayer = document.getElementById("labelLayer");
     const slider = document.getElementById("zoomSlider");
@@ -652,10 +782,12 @@ const html = `<!doctype html>
     const detail = document.getElementById("detail");
     const regionBox = document.getElementById("regions");
     const chips = [...document.querySelectorAll(".chip")];
+    const railToggles = document.getElementById("railToggles");
 
     let transform = { k: 1, x: 0, y: 0 };
     let fitTransform = { k: 1, x: 0, y: 0 };
     let labelScale = Number(labelSlider.value);
+    let visibleRailTypes = new Set([...railToggles.querySelectorAll("input:checked")].map(input => input.value));
     let activeScope = "all";
     let selected = null;
     let dragging = false;
@@ -689,6 +821,7 @@ const html = `<!doctype html>
       mapLayer.setAttribute("transform", \`translate(\${transform.x} \${transform.y}) scale(\${transform.k})\`);
       slider.value = transform.k.toFixed(2);
       scaleReadout.textContent = \`\${transform.k.toFixed(2)}×\`;
+      drawRailways();
       drawCities();
     }
 
@@ -697,6 +830,7 @@ const html = `<!doctype html>
       const height = Math.max(window.innerHeight || document.documentElement.clientHeight || 0, 620);
       app.style.width = \`\${width}px\`;
       app.style.height = \`\${height}px\`;
+      requestAnimationFrame(drawRailways);
       requestAnimationFrame(drawCities);
     }
 
@@ -747,16 +881,45 @@ const html = `<!doctype html>
       };
     }
 
+    function railTypeLabel(types) {
+      const labels = { g: "高铁", d: "动车", normal: "普速" };
+      return (types || []).map(type => labels[type] || type).join(" / ") || "暂无铁路廊道标记";
+    }
+
+    function pointScreen(point) {
+      return {
+        x: transform.x + point.x * transform.k,
+        y: transform.y + point.y * transform.k
+      };
+    }
+
+    function drawRailways() {
+      railLayer.replaceChildren();
+      const visibleRoutes = RAIL_ROUTES.filter(route => visibleRailTypes.has(route.type));
+      for (const route of visibleRoutes) {
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const d = route.points.map((point, index) => {
+          const p = pointScreen(point);
+          return \`\${index === 0 ? "M" : "L"} \${p.x.toFixed(1)} \${p.y.toFixed(1)}\`;
+        }).join(" ");
+        path.setAttribute("d", d);
+        path.setAttribute("class", \`rail-line \${route.type}\`);
+        path.setAttribute("aria-label", route.name);
+        railLayer.appendChild(path);
+      }
+    }
+
     function cityVisibleByScope(city) {
       if (activeScope === "all") return true;
       if (activeScope === "hub") return city.hub;
+      if (activeScope === "rail") return city.railTypes.length > 0;
       return !city.hub;
     }
 
     function cityVisibleBySearch(city) {
       const q = search.value.trim().toLowerCase();
       if (!q) return true;
-      return [city.name, city.shortName, city.provinceName, city.region, city.density, city.samples]
+      return [city.name, city.shortName, city.provinceName, city.region, city.density, railTypeLabel(city.railTypes), city.samples]
         .some(v => String(v).toLowerCase().includes(q));
     }
 
@@ -809,7 +972,7 @@ const html = `<!doctype html>
     }
 
     function renderList(items) {
-      const scopeName = { all: "全部城市", hub: "10+ 强覆盖城市", minor: "1-9 城市" }[activeScope] || "城市";
+      const scopeName = { all: "全部城市", hub: "10+ 强覆盖城市", minor: "1-9 城市", rail: "铁路重叠城市" }[activeScope] || "城市";
       resultMeta.textContent = \`\${scopeName}：显示 \${items.length} 个\`;
       const topItems = [...items].sort((a, b) => {
         if (a.hub !== b.hub) return Number(b.hub) - Number(a.hub);
@@ -824,7 +987,7 @@ const html = `<!doctype html>
           <span class="code" style="background:\${city.hub ? color.hub : color.minor}">\${city.density}</span>
           <span>
             <span class="name">\${escapeHtml(city.shortName)}</span>
-            <span class="meta">\${escapeHtml(city.provinceName)} · \${escapeHtml(city.region)} · 检出 \${city.count} 条</span>
+            <span class="meta">\${escapeHtml(city.provinceName)} · \${escapeHtml(city.region)} · \${escapeHtml(railTypeLabel(city.railTypes))} · 检出 \${city.count} 条</span>
           </span>\`;
         btn.addEventListener("click", () => selectCity(city, true));
         list.appendChild(btn);
@@ -836,6 +999,7 @@ const html = `<!doctype html>
       const sampleText = city.samples ? city.samples.split("；").slice(0, 6).join("；") : "无样例门店";
       detail.innerHTML = \`<strong>\${escapeHtml(city.shortName)}｜\${city.density}</strong><br>
         省份/区域：\${escapeHtml(city.provinceName)} · \${escapeHtml(city.region)}<br>
+        铁路廊道：\${escapeHtml(railTypeLabel(city.railTypes))}<br>
         检出条目：\${city.count}　坐标：\${city.lat.toFixed(4)}, \${city.lon.toFixed(4)}<br>
         <span class="samples">样例：\${escapeHtml(sampleText)}</span>\`;
       if (fly) {
@@ -922,6 +1086,10 @@ const html = `<!doctype html>
       drawCities();
     });
     showAllLabels.addEventListener("change", drawCities);
+    railToggles.addEventListener("change", () => {
+      visibleRailTypes = new Set([...railToggles.querySelectorAll("input:checked")].map(input => input.value));
+      drawRailways();
+    });
     document.getElementById("zoomIn").addEventListener("click", () => zoomAt({ x: SVG_W / 2, y: SVG_H / 2 }, transform.k * 1.22));
     document.getElementById("zoomOut").addEventListener("click", () => zoomAt({ x: SVG_W / 2, y: SVG_H / 2 }, transform.k / 1.22));
     document.getElementById("fitMap").addEventListener("click", () => fitItems(CITIES, true));
