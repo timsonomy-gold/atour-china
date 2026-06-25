@@ -189,10 +189,13 @@ function regionFor(city) {
 
 const railRouteDefinitions = [
   { type: "fast", name: "京沪高铁", cities: ["北京", "天津", "济南", "泰安", "徐州", "宿州", "蚌埠", "滁州", "南京", "镇江", "常州", "无锡", "苏州", "上海"] },
+  { type: "fast", name: "京津城际/京唐津秦动车", cities: ["北京", "天津", "唐山", "秦皇岛"] },
+  { type: "fast", name: "津保/石济动车", cities: ["天津", "保定", "石家庄", "衡水", "德州", "济南"] },
   { type: "fast", name: "京广深高铁", cities: ["北京", "保定", "石家庄", "邢台", "邯郸", "安阳", "郑州", "许昌", "漯河", "驻马店", "信阳", "武汉", "咸宁", "岳阳", "长沙", "株洲", "衡阳", "郴州", "韶关", "广州", "深圳"] },
   { type: "fast", name: "京哈高铁", cities: ["北京", "承德", "朝阳", "阜新", "沈阳", "铁岭", "长春", "哈尔滨"] },
+  { type: "fast", name: "京雄/京张动车", cities: ["北京", "保定", "张家口"] },
   { type: "fast", name: "沪昆高铁", cities: ["上海", "嘉兴", "杭州", "金华", "衢州", "上饶", "鹰潭", "南昌", "宜春", "萍乡", "长沙", "娄底", "怀化", "铜仁", "贵阳", "安顺", "曲靖", "昆明"] },
-  { type: "fast", name: "沿海高铁", cities: ["大连", "营口", "盘锦", "锦州", "秦皇岛", "唐山", "天津", "沧州", "滨州", "东营", "潍坊", "青岛", "日照", "连云港", "盐城", "南通", "苏州", "上海", "嘉兴", "宁波", "台州", "温州", "宁德", "福州", "莆田", "泉州", "厦门", "漳州", "潮州", "汕头", "汕尾", "深圳", "广州"] },
+  { type: "fast", name: "沿海高铁/动车主通道", cities: ["大连", "营口", "盘锦", "锦州", "秦皇岛", "唐山", "天津", "沧州", "滨州", "东营", "潍坊", "青岛", "日照", "连云港", "盐城", "南通", "苏州", "上海", "嘉兴", "宁波", "台州", "温州", "宁德", "福州", "莆田", "泉州", "厦门", "漳州", "潮州", "汕头", "汕尾", "深圳", "广州"] },
   { type: "fast", name: "徐兰/兰新高铁", cities: ["连云港", "徐州", "商丘", "开封", "郑州", "洛阳", "三门峡", "渭南", "西安", "宝鸡", "天水", "兰州", "西宁", "张掖", "酒泉", "哈密", "吐鲁番", "乌鲁木齐"] },
   { type: "fast", name: "沪汉蓉快速客运通道", cities: ["上海", "苏州", "无锡", "常州", "镇江", "南京", "合肥", "六安", "武汉", "荆州", "宜昌", "恩施", "重庆", "遂宁", "成都"] },
   { type: "fast", name: "西成/成渝高铁", cities: ["西安", "汉中", "广元", "绵阳", "德阳", "成都", "资阳", "内江", "重庆"] },
@@ -201,15 +204,29 @@ const railRouteDefinitions = [
   { type: "fast", name: "银兰动车/中兰客专", cities: ["银川", "吴忠", "中卫", "白银", "兰州"] },
   { type: "fast", name: "西中动车", cities: ["西安", "庆阳", "吴忠", "中卫"] },
   { type: "fast", name: "胶东动车圈", cities: ["济南", "淄博", "潍坊", "青岛", "烟台", "威海", "日照", "临沂"] },
+  { type: "fast", name: "济青/青盐动车", cities: ["济南", "淄博", "潍坊", "青岛", "日照", "连云港"] },
+  { type: "fast", name: "潍烟/莱荣动车", cities: ["潍坊", "烟台", "威海"] },
   { type: "fast", name: "珠三角城际/动车", cities: ["广州", "佛山", "肇庆", "清远", "东莞", "深圳", "惠州", "汕尾", "中山", "珠海", "江门"] },
+  { type: "fast", name: "广珠/江湛动车", cities: ["广州", "中山", "珠海", "江门", "阳江", "茂名", "湛江"] },
+  { type: "fast", name: "广深港/穗深城际", cities: ["广州", "东莞", "深圳"] },
+  { type: "fast", name: "莞惠/赣深联络", cities: ["东莞", "惠州", "河源", "赣州"] },
   { type: "fast", name: "东北动车圈", cities: ["大连", "营口", "鞍山", "辽阳", "沈阳", "抚顺", "本溪", "丹东", "四平", "长春", "吉林", "哈尔滨"] },
+  { type: "fast", name: "哈大高铁", cities: ["哈尔滨", "长春", "四平", "铁岭", "沈阳", "辽阳", "鞍山", "营口", "大连"] },
+  { type: "fast", name: "盘营/秦沈动车", cities: ["沈阳", "盘锦", "锦州", "葫芦岛", "秦皇岛"] },
   { type: "fast", name: "海南环岛动车", cities: ["海口", "文昌", "琼海", "万宁", "三亚", "东方", "儋州"] },
   { type: "fast", name: "福建/赣南动车", cities: ["福州", "宁德", "南平", "三明", "龙岩", "厦门", "漳州", "赣州", "吉安", "南昌"] },
+  { type: "fast", name: "昌福/永莆动车", cities: ["南昌", "抚州", "三明", "莆田", "福州"] },
+  { type: "fast", name: "南龙/龙厦动车", cities: ["南平", "三明", "龙岩", "厦门"] },
   { type: "fast", name: "北疆动车", cities: ["乌鲁木齐", "昌吉", "石河子", "克拉玛依", "博尔塔拉", "伊犁"] },
   { type: "fast", name: "成渝贵动车", cities: ["成都", "资阳", "内江", "自贡", "泸州", "宜宾", "遵义", "贵阳", "重庆"] },
+  { type: "fast", name: "成绵乐/成雅动车", cities: ["成都", "德阳", "绵阳", "眉山", "乐山", "雅安"] },
+  { type: "fast", name: "成宜/渝昆川南动车", cities: ["成都", "资阳", "自贡", "宜宾", "泸州", "重庆"] },
   { type: "fast", name: "合福高铁", cities: ["合肥", "铜陵", "黄山", "上饶", "南平", "福州"] },
   { type: "fast", name: "商合杭高铁", cities: ["商丘", "亳州", "阜阳", "淮南", "合肥", "芜湖", "宣城", "湖州", "杭州"] },
+  { type: "fast", name: "郑阜/阜淮合动车", cities: ["郑州", "周口", "阜阳", "淮南", "合肥"] },
   { type: "fast", name: "杭昌/杭黄动车", cities: ["杭州", "黄山", "景德镇", "九江", "南昌"] },
+  { type: "fast", name: "沪苏湖/杭台动车", cities: ["上海", "苏州", "湖州", "杭州", "绍兴", "台州"] },
+  { type: "fast", name: "杭温动车", cities: ["杭州", "金华", "台州", "温州"] },
   { type: "fast", name: "郑渝高铁", cities: ["郑州", "许昌", "平顶山", "南阳", "襄阳", "重庆"] },
   { type: "fast", name: "渝昆高铁/动车", cities: ["重庆", "泸州", "宜宾", "昭通", "曲靖", "昆明"] },
   { type: "fast", name: "成达万动车", cities: ["成都", "遂宁", "南充", "达州", "重庆"] },
@@ -217,21 +234,30 @@ const railRouteDefinitions = [
   { type: "fast", name: "汉十高铁", cities: ["武汉", "孝感", "随州", "襄阳", "十堰"] },
   { type: "fast", name: "济郑高铁", cities: ["济南", "聊城", "濮阳", "郑州"] },
   { type: "fast", name: "郑太动车", cities: ["郑州", "焦作", "晋城", "长治", "晋中", "太原"] },
+  { type: "fast", name: "石太/太青动车", cities: ["青岛", "潍坊", "淄博", "济南", "德州", "衡水", "石家庄", "阳泉", "太原"] },
   { type: "fast", name: "大西高铁", cities: ["大同", "忻州", "太原", "晋中", "临汾", "运城", "西安"] },
   { type: "fast", name: "京张/呼张动车", cities: ["北京", "张家口", "乌兰察布", "呼和浩特", "包头"] },
+  { type: "fast", name: "呼包鄂动车", cities: ["呼和浩特", "包头", "鄂尔多斯"] },
   { type: "fast", name: "哈齐动车", cities: ["哈尔滨", "大庆", "齐齐哈尔"] },
   { type: "fast", name: "哈牡/牡佳动车", cities: ["哈尔滨", "牡丹江", "佳木斯"] },
+  { type: "fast", name: "哈佳/齐佳动车", cities: ["齐齐哈尔", "哈尔滨", "佳木斯"] },
   { type: "fast", name: "长珲城际", cities: ["长春", "吉林", "延边"] },
   { type: "fast", name: "沈丹/丹大动车", cities: ["沈阳", "本溪", "丹东", "大连"] },
   { type: "fast", name: "青荣城际", cities: ["青岛", "烟台", "威海"] },
   { type: "fast", name: "鲁南/日兰动车", cities: ["日照", "临沂", "济宁", "菏泽", "郑州"] },
   { type: "fast", name: "南沿江/沪宁动车", cities: ["南京", "镇江", "常州", "无锡", "苏州", "上海"] },
   { type: "fast", name: "宁安/安九动车", cities: ["南京", "芜湖", "铜陵", "池州", "安庆", "九江"] },
+  { type: "fast", name: "合安/池黄动车", cities: ["合肥", "安庆", "池州", "黄山"] },
   { type: "fast", name: "昌九/昌赣动车", cities: ["九江", "南昌", "吉安", "赣州"] },
   { type: "fast", name: "赣深高铁", cities: ["赣州", "河源", "惠州", "深圳"] },
+  { type: "fast", name: "长株潭/怀邵衡动车", cities: ["长沙", "湘潭", "株洲", "衡阳", "邵阳", "怀化"] },
+  { type: "fast", name: "常益长动车", cities: ["常德", "益阳", "长沙"] },
   { type: "fast", name: "柳南/湘桂动车", cities: ["桂林", "柳州", "南宁"] },
   { type: "fast", name: "贵南动车", cities: ["贵阳", "黔南", "河池", "南宁"] },
+  { type: "fast", name: "贵广贵州段动车", cities: ["贵阳", "黔南", "黔东南", "桂林"] },
+  { type: "fast", name: "安六动车", cities: ["安顺", "六盘水"] },
   { type: "fast", name: "南昆动车", cities: ["南宁", "百色", "曲靖", "昆明"] },
+  { type: "fast", name: "南崇/北部湾动车", cities: ["南宁", "崇左", "钦州", "北海", "防城港"] },
   { type: "fast", name: "北部湾动车", cities: ["南宁", "钦州", "北海", "防城港"] },
   { type: "fast", name: "广湛/深湛动车", cities: ["广州", "佛山", "江门", "阳江", "茂名", "湛江"] },
   { type: "fast", name: "梅汕/龙龙动车", cities: ["龙岩", "梅州", "潮州", "汕头"] },
@@ -239,26 +265,38 @@ const railRouteDefinitions = [
   { type: "fast", name: "西银动车", cities: ["西安", "咸阳", "庆阳", "吴忠", "银川"] },
   { type: "fast", name: "兰渝动车", cities: ["兰州", "陇南", "广元", "南充", "重庆"] },
   { type: "fast", name: "兰新动车", cities: ["兰州", "西宁", "张掖", "酒泉", "哈密", "吐鲁番", "乌鲁木齐"] },
+  { type: "fast", name: "兰张动车", cities: ["兰州", "武威", "张掖"] },
   { type: "fast", name: "滇西动车", cities: ["昆明", "楚雄", "大理", "保山", "德宏"] },
+  { type: "fast", name: "滇南动车", cities: ["昆明", "玉溪", "红河", "文山"] },
   { type: "fast", name: "中老铁路动车", cities: ["昆明", "玉溪", "普洱", "西双版纳"] },
   { type: "fast", name: "黔张常/张吉怀动车", cities: ["重庆", "恩施", "张家界", "湘西", "怀化", "邵阳", "长沙"] },
   { type: "normal", name: "京九铁路", cities: ["北京", "衡水", "聊城", "菏泽", "商丘", "阜阳", "九江", "南昌", "吉安", "赣州", "河源", "惠州", "深圳"] },
   { type: "normal", name: "京广普速铁路", cities: ["北京", "保定", "石家庄", "邢台", "邯郸", "安阳", "郑州", "许昌", "漯河", "驻马店", "信阳", "武汉", "岳阳", "长沙", "衡阳", "郴州", "韶关", "广州"] },
+  { type: "normal", name: "京原/同蒲铁路", cities: ["北京", "张家口", "大同", "忻州", "太原", "临汾", "运城"] },
   { type: "normal", name: "陇海/兰新普速铁路", cities: ["连云港", "徐州", "商丘", "开封", "郑州", "洛阳", "三门峡", "渭南", "西安", "宝鸡", "天水", "兰州", "武威", "张掖", "酒泉", "哈密", "吐鲁番", "乌鲁木齐"] },
   { type: "normal", name: "沪昆普速铁路", cities: ["上海", "嘉兴", "杭州", "金华", "衢州", "上饶", "鹰潭", "南昌", "新余", "宜春", "萍乡", "株洲", "娄底", "怀化", "凯里", "贵阳", "安顺", "曲靖", "昆明"] },
   { type: "normal", name: "成昆铁路", cities: ["成都", "眉山", "乐山", "凉山", "攀枝花", "楚雄", "昆明"] },
+  { type: "normal", name: "宝成/成渝铁路", cities: ["宝鸡", "汉中", "广元", "绵阳", "成都", "内江", "重庆"] },
   { type: "normal", name: "京包/包兰铁路", cities: ["北京", "张家口", "乌兰察布", "呼和浩特", "包头", "巴彦淖尔", "乌海", "银川", "中卫", "兰州"] },
+  { type: "normal", name: "包西/西康铁路", cities: ["包头", "鄂尔多斯", "榆林", "延安", "西安", "安康"] },
   { type: "normal", name: "哈大/滨洲铁路", cities: ["哈尔滨", "大庆", "齐齐哈尔", "呼伦贝尔", "长春", "四平", "铁岭", "沈阳", "鞍山", "营口", "大连"] },
   { type: "normal", name: "京沪普速铁路", cities: ["北京", "天津", "沧州", "德州", "济南", "泰安", "徐州", "宿州", "蚌埠", "滁州", "南京", "镇江", "常州", "无锡", "苏州", "上海"] },
   { type: "normal", name: "京哈普速铁路", cities: ["北京", "唐山", "秦皇岛", "葫芦岛", "锦州", "沈阳", "四平", "长春", "哈尔滨"] },
+  { type: "normal", name: "沈山/津山铁路", cities: ["天津", "唐山", "秦皇岛", "葫芦岛", "锦州", "盘锦", "沈阳"] },
   { type: "normal", name: "焦柳铁路", cities: ["焦作", "洛阳", "南阳", "襄阳", "荆门", "常德", "怀化", "柳州"] },
+  { type: "normal", name: "太焦铁路", cities: ["太原", "晋中", "长治", "晋城", "焦作"] },
+  { type: "normal", name: "宁西铁路", cities: ["南京", "合肥", "六安", "信阳", "南阳", "商洛", "西安"] },
   { type: "normal", name: "湘桂铁路", cities: ["衡阳", "永州", "桂林", "柳州", "南宁"] },
   { type: "normal", name: "兰渝铁路", cities: ["兰州", "陇南", "广元", "南充", "重庆"] },
+  { type: "normal", name: "襄渝铁路", cities: ["襄阳", "十堰", "安康", "达州", "重庆"] },
+  { type: "normal", name: "渝怀铁路", cities: ["重庆", "黔江", "铜仁", "怀化"] },
   { type: "normal", name: "南疆铁路", cities: ["乌鲁木齐", "吐鲁番", "巴音郭楞", "阿克苏", "喀什", "和田"] },
   { type: "normal", name: "北疆铁路", cities: ["乌鲁木齐", "石河子", "克拉玛依", "博尔塔拉", "伊犁", "阿勒泰"] },
   { type: "normal", name: "滨绥铁路", cities: ["哈尔滨", "牡丹江", "绥化", "佳木斯"] },
+  { type: "normal", name: "集通/通霍铁路", cities: ["呼和浩特", "乌兰察布", "锡林郭勒", "赤峰", "通辽", "兴安盟"] },
   { type: "normal", name: "鹰厦/峰福铁路", cities: ["鹰潭", "南平", "三明", "福州", "龙岩", "厦门"] },
   { type: "normal", name: "黎湛/河茂铁路", cities: ["柳州", "贵港", "玉林", "茂名", "湛江"] },
+  { type: "normal", name: "广梅汕/畲龙铁路", cities: ["广州", "惠州", "河源", "梅州", "龙岩"] },
   { type: "normal", name: "川黔/黔桂铁路", cities: ["重庆", "遵义", "贵阳", "黔南", "柳州"] },
   { type: "normal", name: "淮南/皖赣铁路", cities: ["淮南", "合肥", "芜湖", "宣城", "黄山", "景德镇", "鹰潭"] },
   { type: "normal", name: "青藏铁路", cities: ["西宁", "海西州", "拉萨", "日喀则"] },
@@ -284,13 +322,33 @@ for (const city of baseCities) {
   cityByRailName.set(city.shortName, city);
   cityByRailName.set(city.name, city);
 }
+const railNameAliases = new Map([
+  ["海西州", "海西蒙古族藏族自治州"],
+  ["兴安盟", "兴安盟"],
+  ["延边", "延边朝鲜族自治州"],
+  ["凉山", "凉山彝族自治州"],
+  ["巴音郭楞", "巴音郭楞蒙古自治州"],
+  ["博尔塔拉", "博尔塔拉蒙古自治州"],
+  ["德宏", "德宏傣族景颇族自治州"],
+  ["红河", "红河哈尼族彝族自治州"],
+  ["文山", "文山壮族苗族自治州"],
+  ["西双版纳", "西双版纳傣族自治州"],
+  ["黔南", "黔南布依族苗族自治州"],
+  ["黔东南", "黔东南苗族侗族自治州"],
+  ["湘西", "湘西土家族苗族自治州"],
+  ["恩施", "恩施土家族苗族自治州"],
+]);
+
+function findRailCity(name) {
+  return cityByRailName.get(name) || cityByRailName.get(railNameAliases.get(name));
+}
 
 const railTypesByCity = new Map(baseCities.map(city => [city.adcode, new Set()]));
 const railRoutes = railRouteDefinitions
   .map(route => {
     const seen = new Set();
     const points = route.cities
-      .map(name => cityByRailName.get(name))
+      .map(name => findRailCity(name))
       .filter(Boolean)
       .filter(city => {
         if (seen.has(city.adcode)) return false;
@@ -402,18 +460,30 @@ const html = `<!doctype html>
       stroke-linecap: round;
       stroke-linejoin: round;
       vector-effect: non-scaling-stroke;
-      opacity: 0.62;
+      opacity: 0.38;
       pointer-events: none;
     }
     .rail-line.fast {
       stroke: var(--rail-fast);
-      stroke-width: 4.8;
+      stroke-width: 2.6;
     }
     .rail-line.normal {
       stroke: var(--rail-normal);
+      stroke-width: 1.9;
+      stroke-dasharray: 5 9;
+      opacity: 0.28;
+    }
+    .rail-line.branch {
+      opacity: 0.27;
+      stroke-width: 1.7;
+    }
+    .rail-line.fast.trunk {
+      opacity: 0.5;
       stroke-width: 3.2;
-      stroke-dasharray: 4 9;
-      opacity: 0.46;
+    }
+    .rail-line.normal.trunk {
+      opacity: 0.34;
+      stroke-width: 2.2;
     }
     .city-hit {
       cursor: pointer;
@@ -935,24 +1005,23 @@ const html = `<!doctype html>
       };
     }
 
+    function routePath(points) {
+      return points.map((point, index) => {
+        const p = pointScreen(point);
+        return \`\${index === 0 ? "M" : "L"} \${p.x.toFixed(1)} \${p.y.toFixed(1)}\`;
+      }).join(" ");
+    }
+
     function drawRailways() {
       railLayer.replaceChildren();
-      const byType = { fast: [], normal: [] };
-      for (const route of RAIL_ROUTES) {
-        if (!visibleRailTypes.has(route.type)) continue;
-        byType[route.type]?.push(route);
-      }
-      for (const type of ["normal", "fast"]) {
-        if (!byType[type]?.length) continue;
+      const visibleRoutes = RAIL_ROUTES
+        .filter(route => visibleRailTypes.has(route.type))
+        .sort((a, b) => (a.type === b.type ? a.points.length - b.points.length : a.type.localeCompare(b.type)));
+      for (const route of visibleRoutes) {
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        const d = byType[type].map(route => route.points.map((point, index) => {
-            const p = pointScreen(point);
-            return \`\${index === 0 ? "M" : "L"} \${p.x.toFixed(1)} \${p.y.toFixed(1)}\`;
-          }).join(" "))
-          .join(" ");
-        path.setAttribute("d", d);
-        path.setAttribute("class", \`rail-line \${type}\`);
-        path.setAttribute("aria-label", \`\${railTypeLabel([type])}线路\`);
+        path.setAttribute("d", routePath(route.points));
+        path.setAttribute("class", \`rail-line \${route.type} \${route.points.length >= 8 ? "trunk" : "branch"}\`);
+        path.setAttribute("aria-label", \`\${route.name}：\${railTypeLabel([route.type])}\`);
         railLayer.appendChild(path);
       }
     }
