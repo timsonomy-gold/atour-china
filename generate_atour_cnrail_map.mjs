@@ -189,16 +189,24 @@ const html = `<!doctype html>
       --blue: #2f78b7;
       --line: #d8e0da;
       --shadow: 0 12px 30px rgba(31,45,37,.14);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
     }
     * { box-sizing: border-box; }
-    html, body, .app, #map { width: 100%; height: 100%; margin: 0; }
+    html, body, .app { width: 100%; height: 100%; margin: 0; }
+    #map { width: 100%; height: 100%; }
+    @supports (height: 100dvh) {
+      html, body, .app { height: 100dvh; }
+    }
     body {
       color: var(--ink);
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "STHeiti", "Microsoft YaHei", sans-serif;
       overflow: hidden;
     }
     .app { display: grid; grid-template-columns: minmax(0, 1fr) 380px; background: #eef1eb; }
-    .map-shell { position: relative; min-width: 0; }
+    .map-shell { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
     .hud {
       position: absolute;
       top: 18px;
@@ -244,6 +252,8 @@ const html = `<!doctype html>
       width: 360px;
       padding: 12px;
     }
+    .controls-summary { display: none; }
+    .controls-body { display: block; }
     .rail-toggles {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -386,12 +396,125 @@ const html = `<!doctype html>
       line-height: 1.6;
       box-shadow: var(--shadow);
     }
-    @media (max-width: 900px) {
-      .app { grid-template-columns: 1fr; grid-template-rows: minmax(0, 62%) minmax(260px, 38%); }
-      .side { border-left: 0; border-top: 1px solid #d8e0da; }
-      .controls { width: calc(100% - 36px); }
+    @media (max-width: 900px), (pointer: coarse) and (max-height: 520px) {
+      .app { grid-template-columns: 1fr; grid-template-rows: minmax(330px, 56dvh) minmax(280px, 1fr); }
+      .hud {
+        top: calc(8px + var(--safe-top));
+        left: calc(8px + var(--safe-left));
+        right: calc(8px + var(--safe-right));
+        gap: 6px;
+        max-width: none;
+      }
+      .title { padding: 9px 11px; }
+      h1 { font-size: 18px; line-height: 1.2; }
+      .subtitle { display: none; }
+      .legend {
+        max-width: 100%;
+        flex-wrap: nowrap;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 7px 9px;
+        font-size: 11px;
+        scrollbar-width: none;
+      }
+      .legend::-webkit-scrollbar { display: none; }
+      .legend span { flex: 0 0 auto; }
+      .dot { width: 8px; height: 8px; }
+      .sample-line { width: 18px; border-top-width: 2px; }
+      .controls {
+        left: calc(8px + var(--safe-left));
+        right: calc(8px + var(--safe-right));
+        bottom: calc(8px + var(--safe-bottom));
+        width: auto;
+        padding: 7px;
+      }
+      .controls:not([open]) {
+        right: auto;
+        width: 104px;
+      }
+      .controls-summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 30px;
+        gap: 10px;
+        color: #26352e;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 700;
+        list-style: none;
+      }
+      .controls-summary::-webkit-details-marker { display: none; }
+      .controls-summary::after {
+        content: "展开";
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .controls[open] .controls-summary::after { content: "收起"; }
+      .controls:not([open]) .controls-summary::after { display: none; }
+      .controls[open] .controls-body {
+        margin-top: 7px;
+      }
+      .rail-toggles {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+        margin-bottom: 8px;
+        font-size: 11px;
+      }
+      .rail-toggles label, .toggle-row {
+        min-height: 28px;
+        min-width: 0;
+        padding: 4px 6px;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .rail-toggles input { width: 14px; height: 14px; margin: 0; flex: 0 0 auto; }
+      .fit-button { height: 32px; padding: 6px; font-size: 12px; }
+      .maplibregl-ctrl-top-right {
+        top: 86px;
+        right: calc(8px + var(--safe-right));
+      }
+      .side {
+        border-left: 0;
+        border-top: 1px solid #d8e0da;
+        padding: 12px 12px calc(18px + var(--safe-bottom));
+      }
+      .search { height: 38px; font-size: 13px; }
+      .filters, .regions {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 7px;
+        margin: 10px 0;
+        scrollbar-width: none;
+      }
+      .filters::-webkit-scrollbar, .regions::-webkit-scrollbar { display: none; }
+      .chip, .region-btn {
+        flex: 0 0 auto;
+        padding: 7px 9px;
+        font-size: 12px;
+      }
+      .region-btn { width: auto; min-width: 112px; }
+      .result-meta { margin: 12px 0 8px; }
+      .list { gap: 6px; padding-bottom: 28px; }
+      .item { grid-template-columns: 44px 1fr; gap: 8px; padding: 8px 0; }
+      .code { width: 36px; height: 30px; font-size: 12px; }
+      .name { font-size: 15px; }
+      .meta { font-size: 11px; }
       .detail { display: none; }
-      h1 { font-size: 21px; }
+    }
+    @media (max-width: 420px) {
+      .app { grid-template-rows: minmax(320px, 54dvh) minmax(280px, 1fr); }
+      h1 { font-size: 16px; }
+      .legend { font-size: 10px; }
+      .rail-toggles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .maplibregl-ctrl-top-right { top: 78px; }
+    }
+    @media (max-height: 520px) and (orientation: landscape) {
+      .app { grid-template-columns: minmax(0, 1fr) minmax(300px, 36vw); grid-template-rows: 1fr; }
+      .legend { display: none; }
+      .controls { max-width: 330px; }
+      .side { border-top: 0; border-left: 1px solid #d8e0da; }
     }
   </style>
 </head>
@@ -414,17 +537,20 @@ const html = `<!doctype html>
           <span><i class="sample-line" style="border-color:#86a800"></i>F/其他</span>
         </div>
       </div>
-      <div class="controls panel">
-        <div class="rail-toggles" id="railToggles">
-          <label><input type="checkbox" value="hsr" checked>HSR 高速</label>
-          <label><input type="checkbox" value="rr" checked>RR 快速/动车</label>
-          <label><input type="checkbox" value="r" checked>R 普速</label>
-          <label><input type="checkbox" value="f" checked>F/其他</label>
-          <label><input type="checkbox" value="construction">在建</label>
-          <label><input id="showLabels" type="checkbox" checked>城市名</label>
+      <details class="controls panel" open>
+        <summary class="controls-summary">图层</summary>
+        <div class="controls-body">
+          <div class="rail-toggles" id="railToggles">
+            <label><input type="checkbox" value="hsr" checked>HSR 高速</label>
+            <label><input type="checkbox" value="rr" checked>RR 快速/动车</label>
+            <label><input type="checkbox" value="r" checked>R 普速</label>
+            <label><input type="checkbox" value="f" checked>F/其他</label>
+            <label><input type="checkbox" value="construction">在建</label>
+            <label><input id="showLabels" type="checkbox" checked>城市名</label>
+          </div>
+          <button id="fitMap" class="fit-button">适应全国</button>
         </div>
-        <button id="fitMap" class="fit-button">适应全国</button>
-      </div>
+      </details>
     </section>
     <aside class="side">
       <input id="search" class="search" placeholder="搜索城市、省份、区域或样例门店" autocomplete="off">
@@ -456,6 +582,7 @@ const html = `<!doctype html>
     const markers = new Map();
     let selected = null;
     let activeScope = "all";
+    const compactQuery = window.matchMedia("(max-width: 900px), (pointer: coarse) and (max-height: 520px)");
 
     let map = null;
     function styleForCurrentPage() {
@@ -490,11 +617,35 @@ const html = `<!doctype html>
     const showLabels = document.getElementById("showLabels");
     const railToggles = document.getElementById("railToggles");
     const mapError = document.getElementById("mapError");
+    const controlsPanel = document.querySelector(".controls");
+    let syncingControlsPanel = false;
+    let controlsPanelTouched = false;
 
     if (!map) {
       mapError.style.display = "block";
     }
+    if (controlsPanel) {
+      controlsPanel.addEventListener("toggle", () => {
+        if (!syncingControlsPanel) controlsPanelTouched = true;
+      });
+    }
 
+    function refreshResponsiveState() {
+      const compact = compactQuery.matches;
+      document.documentElement.dataset.device = compact ? "compact" : "wide";
+      if (controlsPanel && !controlsPanelTouched) {
+        const collapseControls = compact && window.innerWidth <= 520 && window.innerHeight >= window.innerWidth;
+        if (controlsPanel.open === collapseControls) {
+          syncingControlsPanel = true;
+          controlsPanel.open = !collapseControls;
+          window.setTimeout(() => { syncingControlsPanel = false; }, 0);
+        }
+      }
+      if (map) window.requestAnimationFrame(() => {
+        map.resize();
+        renderMarkers();
+      });
+    }
     function escapeHtml(value) {
       return String(value)
         .replaceAll("&", "&amp;")
@@ -614,10 +765,18 @@ const html = `<!doctype html>
       refresh();
     }
     refresh();
-    search.addEventListener("input", () => { selected = null; refresh(); });
+      search.addEventListener("input", () => { selected = null; refresh(); });
     showLabels.addEventListener("change", renderMarkers);
     railToggles.addEventListener("change", setLayerVisibility);
     document.getElementById("fitMap").addEventListener("click", fitChina);
+    refreshResponsiveState();
+    if (compactQuery.addEventListener) {
+      compactQuery.addEventListener("change", refreshResponsiveState);
+    } else if (compactQuery.addListener) {
+      compactQuery.addListener(refreshResponsiveState);
+    }
+    window.addEventListener("resize", refreshResponsiveState);
+    window.addEventListener("orientationchange", refreshResponsiveState);
     chips.forEach(chip => chip.addEventListener("click", () => {
       chips.forEach(item => item.classList.remove("active"));
       chip.classList.add("active");
