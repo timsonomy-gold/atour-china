@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
+import zlib from "node:zlib";
 
 const lonMin = 73;
 const lonMax = 135;
@@ -29,16 +30,35 @@ function get(url, dest) {
         return;
       }
       fs.mkdirSync(path.dirname(dest), { recursive: true });
-      const file = fs.createWriteStream(dest);
-      res.pipe(file);
-      file.on("finish", () => file.close(resolve));
-      file.on("error", reject);
+      const chunks = [];
+      res.on("data", chunk => chunks.push(chunk));
+      res.on("end", () => {
+        const raw = Buffer.concat(chunks);
+        fs.writeFileSync(dest, maybeGunzip(raw));
+        resolve();
+      });
+      res.on("error", reject);
     });
     req.setTimeout(20000, () => {
       req.destroy(new Error(`timeout ${url}`));
     });
     req.on("error", reject);
   });
+}
+
+function isGzip(buffer) {
+  return buffer.length >= 2 && buffer[0] === 0x1f && buffer[1] === 0x8b;
+}
+
+function maybeGunzip(buffer) {
+  return isGzip(buffer) ? zlib.gunzipSync(buffer) : buffer;
+}
+
+function normalizeExistingTile(file) {
+  const raw = fs.readFileSync(file);
+  if (!isGzip(raw)) return false;
+  fs.writeFileSync(file, zlib.gunzipSync(raw));
+  return true;
 }
 
 const jobs = [];
@@ -57,6 +77,7 @@ for (let z = minZoom; z <= maxZoom; z++) {
 let done = 0;
 let failed = 0;
 let skipped = 0;
+let converted = 0;
 let cursor = 0;
 
 async function worker() {
@@ -64,6 +85,7 @@ async function worker() {
     const job = jobs[cursor++];
     const dest = path.join(outDir, String(job.z), String(job.x), `${job.y}.pbf`);
     if (fs.existsSync(dest) && fs.statSync(dest).size > 0) {
+      if (normalizeExistingTile(dest)) converted++;
       skipped++;
       continue;
     }
@@ -82,4 +104,4 @@ async function worker() {
 }
 
 await Promise.all(Array.from({ length: 8 }, () => worker()));
-console.log(JSON.stringify({ total: jobs.length, done, skipped, failed }, null, 2));
+console.log(JSON.stringify({ total: jobs.length, done, skipped, converted, failed }, null, 2));
