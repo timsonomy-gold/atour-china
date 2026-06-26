@@ -1,0 +1,272 @@
+{
+  "version": 8,
+  "name": "Atour CNRail Overlay",
+  "sources": {
+    "cnrail": {
+      "type": "vector",
+      "tiles": [
+        "./cnrail_tiles/{z}/{x}/{y}.pbf"
+      ],
+      "minzoom": 1,
+      "maxzoom": 8,
+      "attribution": "Rail data style inspired by cnrail.geogv.org / WTRANS2, OpenStreetMap contributors"
+    }
+  },
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "#f4f5f0"
+      }
+    },
+    {
+      "id": "water",
+      "type": "fill",
+      "source": "cnrail",
+      "source-layer": "water",
+      "paint": {
+        "fill-color": "#dbe5e8"
+      }
+    },
+    {
+      "id": "natural-water",
+      "type": "fill",
+      "source": "cnrail",
+      "source-layer": "natural",
+      "filter": [
+        "==",
+        "natural",
+        "water"
+      ],
+      "paint": {
+        "fill-color": "#dbe5e8"
+      }
+    },
+    {
+      "id": "admin2b",
+      "type": "line",
+      "source": "cnrail",
+      "source-layer": "admin2b",
+      "paint": {
+        "line-color": "#9da8a0",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          3,
+          0.6,
+          8,
+          1.4
+        ]
+      }
+    },
+    {
+      "id": "admin4b",
+      "type": "line",
+      "source": "cnrail",
+      "source-layer": "admin4b",
+      "minzoom": 5,
+      "paint": {
+        "line-color": "#bdc6bd",
+        "line-width": 0.8,
+        "line-dasharray": [
+          3,
+          2
+        ]
+      }
+    },
+    {
+      "id": "rail-other-minor",
+      "type": "line",
+      "source": "cnrail",
+      "source-layer": "rail",
+      "filter": [
+        "in",
+        "type",
+        "MINOR",
+        "NONE"
+      ],
+      "paint": {
+        "line-color": "#7a748d",
+        "line-opacity": 0.48,
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          3,
+          0.45,
+          8,
+          1.25,
+          12,
+          2
+        ]
+      }
+    },
+    {
+      "id": "rail-f",
+      "type": "line",
+      "source": "cnrail",
+      "source-layer": "rail",
+      "filter": [
+        "in",
+        "type",
+        "F",
+        "F2"
+      ],
+      "paint": {
+        "line-color": "#86a800",
+        "line-opacity": 0.7,
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          3,
+          0.7,
+          8,
+          1.8,
+          12,
+          3
+        ]
+      }
+    },
+    {
+      "id": "rail-r",
+      "type": "line",
+      "source": "cnrail",
+      "source-layer": "rail",
+      "filter": [
+        "in",
+        "type",
+        "R",
+        "R2"
+      ],
+      "paint": {
+        "line-color": "#209a3b",
+        "line-opacity": 0.78,
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          3,
+          0.8,
+          8,
+          2,
+          12,
+          3.2
+        ]
+      }
+    },
+    {
+      "id": "rail-rr",
+      "type": "line",
+      "source": "cnrail",
+      "source-layer": "rail",
+      "filter": [
+        "in",
+        "type",
+        "RR",
+        "RR2"
+      ],
+      "paint": {
+        "line-color": "#f08a00",
+        "line-opacity": 0.86,
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          3,
+          0.9,
+          8,
+          2.4,
+          12,
+          3.8
+        ]
+      }
+    },
+    {
+      "id": "rail-hsr",
+      "type": "line",
+      "source": "cnrail",
+      "source-layer": "rail",
+      "filter": [
+        "in",
+        "type",
+        "HSR",
+        "HSR2"
+      ],
+      "paint": {
+        "line-color": "#ef2f21",
+        "line-opacity": 0.9,
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          3,
+          1,
+          8,
+          2.8,
+          12,
+          4.2
+        ]
+      }
+    },
+    {
+      "id": "rail-construction",
+      "type": "line",
+      "source": "cnrail",
+      "source-layer": "rail",
+      "filter": [
+        "in",
+        "type",
+        "HSR_CON",
+        "RR_CON"
+      ],
+      "paint": {
+        "line-color": "#ef2f21",
+        "line-opacity": 0.42,
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          5,
+          1,
+          10,
+          2.6
+        ],
+        "line-dasharray": [
+          2,
+          2
+        ]
+      }
+    }
+  ]
+}
