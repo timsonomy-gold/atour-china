@@ -208,9 +208,10 @@ const html = `<!doctype html>
       display: grid;
       grid-template-columns: minmax(0, 1fr) 380px;
       background: #eef1eb;
+      position: relative;
       transition: grid-template-columns .22s ease, grid-template-rows .22s ease;
     }
-    .app.side-collapsed { grid-template-columns: minmax(0, 1fr) 58px; }
+    .app.side-collapsed { grid-template-columns: minmax(0, 1fr); }
     .map-shell { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
     .hud {
       position: absolute;
@@ -318,6 +319,15 @@ const html = `<!doctype html>
       border-radius: 6px;
       background: rgba(255,255,255,.78);
     }
+    .rail-key {
+      flex: 0 0 auto;
+      width: 18px;
+      border-top: 3px solid;
+    }
+    .rail-key.construction {
+      border-top-style: dashed;
+      opacity: .62;
+    }
     .fit-button {
       width: 100%;
       border: 1px solid #c7d4ca;
@@ -396,15 +406,21 @@ const html = `<!doctype html>
       outline-offset: 2px;
     }
     .app.side-collapsed .side {
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-      padding: 10px 8px;
-      overflow: hidden;
+      position: absolute;
+      right: calc(18px + var(--safe-right));
+      bottom: calc(18px + var(--safe-bottom));
+      z-index: 4;
+      width: auto;
+      height: auto;
+      min-width: 0;
+      display: block;
+      padding: 0;
+      overflow: visible;
+      border: 0;
+      background: transparent;
     }
     .app.side-collapsed .side-header {
       margin: 0;
-      width: 100%;
     }
     .app.side-collapsed .side-title,
     .app.side-collapsed .side-body,
@@ -412,10 +428,9 @@ const html = `<!doctype html>
       display: none;
     }
     .app.side-collapsed .side-toggle {
-      width: 100%;
-      min-height: 100%;
-      padding: 6px 4px;
-      writing-mode: vertical-rl;
+      min-height: 28px;
+      padding: 4px 8px;
+      writing-mode: horizontal-tb;
       text-orientation: mixed;
     }
     .search {
@@ -496,7 +511,7 @@ const html = `<!doctype html>
     }
     @media (max-width: 900px), (pointer: coarse) and (max-height: 520px) {
       .app { grid-template-columns: 1fr; grid-template-rows: minmax(330px, 56dvh) minmax(280px, 1fr); }
-      .app.side-collapsed { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) calc(52px + var(--safe-bottom)); }
+      .app.side-collapsed { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr); }
       .hud {
         top: calc(8px + var(--safe-top));
         left: calc(8px + var(--safe-left));
@@ -549,16 +564,16 @@ const html = `<!doctype html>
       .side-toggle { min-height: 30px; padding: 5px 9px; }
       .app.side-collapsed .side {
         display: block;
-        padding: 8px 10px calc(8px + var(--safe-bottom));
+        right: calc(8px + var(--safe-right));
+        bottom: calc(8px + var(--safe-bottom));
+        padding: 0;
       }
       .app.side-collapsed .side-header {
-        height: 100%;
         margin: 0;
       }
       .app.side-collapsed .side-toggle {
-        width: 100%;
-        min-height: 36px;
-        height: 100%;
+        min-height: 28px;
+        padding: 4px 8px;
         writing-mode: horizontal-tb;
       }
       .search { height: 38px; font-size: 13px; }
@@ -595,7 +610,7 @@ const html = `<!doctype html>
     }
     @media (max-height: 520px) and (orientation: landscape) {
       .app { grid-template-columns: minmax(0, 1fr) minmax(300px, 36vw); grid-template-rows: 1fr; }
-      .app.side-collapsed { grid-template-columns: minmax(0, 1fr) 58px; grid-template-rows: 1fr; }
+      .app.side-collapsed { grid-template-columns: minmax(0, 1fr); grid-template-rows: 1fr; }
       .legend { max-width: min(720px, calc(100vw - 24px)); }
       .controls { max-width: 330px; }
       .side { border-top: 0; border-left: 1px solid #d8e0da; }
@@ -603,7 +618,7 @@ const html = `<!doctype html>
   </style>
 </head>
 <body>
-  <main class="app">
+  <main class="app side-collapsed">
     <section class="map-shell">
       <div id="map"></div>
       <div id="mapError" class="map-error">铁路底图需要浏览器启用 WebGL。当前环境无法初始化 MapLibre，因此仅显示右侧城市列表；请在普通 Chrome/Safari/Edge 浏览器中打开以查看精细铁路底图。</div>
@@ -622,11 +637,11 @@ const html = `<!doctype html>
         <summary class="controls-summary">选项</summary>
         <div class="controls-body">
           <div class="rail-toggles" id="railToggles">
-            <label><input type="checkbox" value="hsr" checked>HSR 高速</label>
-            <label><input type="checkbox" value="rr" checked>RR 快速/动车</label>
-            <label><input type="checkbox" value="r" checked>R 普速</label>
-            <label><input type="checkbox" value="f" checked>F/其他</label>
-            <label><input type="checkbox" value="construction">在建</label>
+            <label><input type="checkbox" value="hsr" checked><i class="rail-key" style="border-color:#ef2f21"></i>HSR 高铁</label>
+            <label><input type="checkbox" value="rr" checked><i class="rail-key" style="border-color:#f08a00"></i>RR 动车</label>
+            <label><input type="checkbox" value="r" checked><i class="rail-key" style="border-color:#209a3b"></i>R 普铁</label>
+            <label><input type="checkbox" value="f" checked><i class="rail-key" style="border-color:#86a800"></i>F/其他</label>
+            <label><input type="checkbox" value="construction"><i class="rail-key construction" style="border-color:#ef2f21"></i>在建</label>
             <label><input id="showLabels" type="checkbox" checked>城市名</label>
           </div>
           <button id="fitMap" class="fit-button">适应全国</button>
@@ -636,7 +651,7 @@ const html = `<!doctype html>
     <aside class="side">
       <div class="side-header">
         <div class="side-title">城市列表</div>
-        <button id="sideToggle" class="side-toggle" type="button" aria-expanded="true">收起</button>
+        <button id="sideToggle" class="side-toggle" type="button" aria-expanded="false">城市</button>
       </div>
       <div class="side-body">
         <input id="search" class="search" placeholder="搜索城市、省份、区域或样例门店" autocomplete="off">
@@ -724,7 +739,7 @@ const html = `<!doctype html>
     function setSideCollapsed(collapsed) {
       appShell.classList.toggle("side-collapsed", collapsed);
       sideToggle.setAttribute("aria-expanded", String(!collapsed));
-      sideToggle.textContent = collapsed ? "展开城市列表" : "收起";
+      sideToggle.textContent = collapsed ? "城市" : "收起";
       resizeMapSoon();
     }
     sideToggle.addEventListener("click", () => {
