@@ -83,18 +83,65 @@ function regionFor(code) {
   return "西北";
 }
 
+// The cnrail/WTRANS2 cached vector tiles use a display coordinate system that is
+// offset from the Baidu-derived city coordinates. These affine coefficients were
+// calibrated against 239 matching cnrail administrative POIs after removing two
+// obvious outliers.
+const cnrailCoordTransform = {
+  lon: [-5.098626529795083, 0.015839284457998697, -0.00029383387693408456],
+  lat: [1.1629593950345254, -0.0002524973702872947, 0.01132978893779317],
+};
+
+function cnrailDisplayCoord(lon, lat) {
+  const mapLon = lon + cnrailCoordTransform.lon[0] + cnrailCoordTransform.lon[1] * lon + cnrailCoordTransform.lon[2] * lat;
+  const mapLat = lat + cnrailCoordTransform.lat[0] + cnrailCoordTransform.lat[1] * lon + cnrailCoordTransform.lat[2] * lat;
+  return {
+    mapLon: Number(mapLon.toFixed(6)),
+    mapLat: Number(mapLat.toFixed(6)),
+  };
+}
+
+function cnrailDisplayBounds([[west, south], [east, north]]) {
+  const points = [
+    cnrailDisplayCoord(west, south),
+    cnrailDisplayCoord(west, north),
+    cnrailDisplayCoord(east, south),
+    cnrailDisplayCoord(east, north),
+  ];
+  return [
+    [Math.min(...points.map(point => point.mapLon)), Math.min(...points.map(point => point.mapLat))],
+    [Math.max(...points.map(point => point.mapLon)), Math.max(...points.map(point => point.mapLat))],
+  ];
+}
+
 const cities = parseCsv("atour_city_coverage_baidu_suggestion.csv")
   .filter(city => city.count > 0)
-  .map(city => ({
-    ...city,
-    provinceName: provinceNameByCode.get(city.province) || city.province,
-    region: regionFor(city.province),
-    hub: city.density === "10+",
-  }));
+  .map(city => {
+    const { mapLon, mapLat } = cnrailDisplayCoord(city.lon, city.lat);
+    return {
+      ...city,
+      mapLon,
+      mapLat,
+      provinceName: provinceNameByCode.get(city.province) || city.province,
+      region: regionFor(city.province),
+      hub: city.density === "10+",
+    };
+  });
 
 const total = cities.length;
 const hubs = cities.filter(city => city.hub).length;
 const cityJson = JSON.stringify(cities);
+const chinaBoundsJson = JSON.stringify(cnrailDisplayBounds([[73, 18], [135, 54]]));
+const regionJson = JSON.stringify([
+  { name: "新疆 / 西北", bounds: [[73, 34], [109, 50]] },
+  { name: "青藏 / 川西", bounds: [[78, 26], [107, 39]] },
+  { name: "东北 / 蒙东", bounds: [[112, 38], [135, 54]] },
+  { name: "华北 / 黄淮", bounds: [[104, 31], [124, 43]] },
+  { name: "长三角 / 华东", bounds: [[112, 26], [124, 35]] },
+  { name: "华中 / 成渝", bounds: [[101, 27], [117, 35]] },
+  { name: "西南 / 云贵桂", bounds: [[96, 20], [112, 32]] },
+  { name: "华南 / 海岛", bounds: [[107, 18], [123, 26]] },
+].map(region => ({ ...region, bounds: cnrailDisplayBounds(region.bounds) })));
 
 const cnrailStyle = {
   version: 8,
@@ -124,6 +171,7 @@ const cnrailStyle = {
 };
 
 fs.writeFileSync("cnrail_style_atour.json", JSON.stringify(cnrailStyle, null, 2));
+const cnrailStyleJson = JSON.stringify(cnrailStyle);
 
 const html = `<!doctype html>
 <html lang="zh-CN">
@@ -394,16 +442,9 @@ const html = `<!doctype html>
   <script src="./vendor/maplibre-gl.js"></script>
   <script>
     const CITIES = ${cityJson};
-    const REGIONS = [
-      { name: "新疆 / 西北", bounds: [[73, 34], [109, 50]] },
-      { name: "青藏 / 川西", bounds: [[78, 26], [107, 39]] },
-      { name: "东北 / 蒙东", bounds: [[112, 38], [135, 54]] },
-      { name: "华北 / 黄淮", bounds: [[104, 31], [124, 43]] },
-      { name: "长三角 / 华东", bounds: [[112, 26], [124, 35]] },
-      { name: "华中 / 成渝", bounds: [[101, 27], [117, 35]] },
-      { name: "西南 / 云贵桂", bounds: [[96, 20], [112, 32]] },
-      { name: "华南 / 海岛", bounds: [[107, 18], [123, 26]] }
-    ];
+    const CNRail_STYLE = ${cnrailStyleJson};
+    const CHINA_BOUNDS = ${chinaBoundsJson};
+    const REGIONS = ${regionJson};
     const LAYER_GROUPS = {
       hsr: ["rail-hsr"],
       rr: ["rail-rr"],
@@ -417,10 +458,16 @@ const html = `<!doctype html>
     let activeScope = "all";
 
     let map = null;
+    function styleForCurrentPage() {
+      const style = JSON.parse(JSON.stringify(CNRail_STYLE));
+      const base = new URL(".", window.location.href).href;
+      style.sources.cnrail.tiles = [base + "cnrail_tiles/{z}/{x}/{y}.pbf"];
+      return style;
+    }
     try {
       map = new maplibregl.Map({
         container: "map",
-        style: "./cnrail_style_atour.json",
+        style: styleForCurrentPage(),
         center: [105, 35.8],
         zoom: 3.55,
         minZoom: 3,
@@ -430,7 +477,9 @@ const html = `<!doctype html>
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
       map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
     } catch (error) {
-      document.getElementById("mapError").style.display = "block";
+      const errorBox = document.getElementById("mapError");
+      errorBox.textContent = "铁路底图初始化失败：" + (error && error.message ? error.message : String(error));
+      errorBox.style.display = "block";
     }
 
     const search = document.getElementById("search");
@@ -440,6 +489,11 @@ const html = `<!doctype html>
     const chips = [...document.querySelectorAll(".chip")];
     const showLabels = document.getElementById("showLabels");
     const railToggles = document.getElementById("railToggles");
+    const mapError = document.getElementById("mapError");
+
+    if (!map) {
+      mapError.style.display = "block";
+    }
 
     function escapeHtml(value) {
       return String(value)
@@ -473,7 +527,7 @@ const html = `<!doctype html>
       el.appendChild(label);
       el.addEventListener("click", () => selectCity(city, true));
       const marker = new maplibregl.Marker({ element: el, anchor: "center" })
-        .setLngLat([city.lon, city.lat])
+        .setLngLat([city.mapLon, city.mapLat])
         .addTo(map);
       markers.set(city.adcode, { marker, el, label });
     }
@@ -518,12 +572,12 @@ const html = `<!doctype html>
         省份/区域：\${escapeHtml(city.provinceName)} · \${escapeHtml(city.region)}<br>
         检出条目：\${city.count}　坐标：\${city.lat.toFixed(4)}, \${city.lon.toFixed(4)}<br>
         <span>样例：\${escapeHtml(sampleText)}</span>\`;
-      if (fly && map) map.flyTo({ center: [city.lon, city.lat], zoom: Math.max(map.getZoom(), 7), speed: 0.9 });
+      if (fly && map) map.flyTo({ center: [city.mapLon, city.mapLat], zoom: Math.max(map.getZoom(), 7), speed: 0.9 });
       refresh();
     }
     function fitChina() {
       if (!map) return;
-      map.fitBounds([[73, 18], [135, 54]], { padding: { top: 90, right: 30, bottom: 60, left: 30 }, duration: 600 });
+      map.fitBounds(CHINA_BOUNDS, { padding: { top: 90, right: 30, bottom: 60, left: 30 }, duration: 600 });
     }
     function setLayerVisibility() {
       if (!map) return;
@@ -544,7 +598,13 @@ const html = `<!doctype html>
       document.getElementById("regions").appendChild(btn);
     }
     if (map) {
+      map.on("error", event => {
+        const message = event && event.error && event.error.message ? event.error.message : "未知地图错误";
+        mapError.textContent = "铁路底图加载错误：" + message;
+        mapError.style.display = "block";
+      });
       map.on("load", () => {
+        mapError.style.display = "none";
         setLayerVisibility();
         fitChina();
         refresh();
@@ -553,6 +613,7 @@ const html = `<!doctype html>
     } else {
       refresh();
     }
+    refresh();
     search.addEventListener("input", () => { selected = null; refresh(); });
     showLabels.addEventListener("change", renderMarkers);
     railToggles.addEventListener("change", setLayerVisibility);
