@@ -194,8 +194,8 @@ const html = `<!doctype html>
       --safe-left: env(safe-area-inset-left, 0px);
     }
     * { box-sizing: border-box; }
-    html, body, .app { width: 100%; height: 100%; margin: 0; }
-    #map { width: 100%; height: 100%; }
+    html, body, .app { width: 100%; height: 100%; margin: 0; overscroll-behavior: none; }
+    #map { width: 100%; height: 100%; touch-action: none; overscroll-behavior: none; }
     @supports (height: 100dvh) {
       html, body, .app { height: 100dvh; }
     }
@@ -213,6 +213,15 @@ const html = `<!doctype html>
     }
     .app.side-collapsed { grid-template-columns: minmax(0, 1fr); }
     .map-shell { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+    .map-shell,
+    .maplibregl-map,
+    .maplibregl-canvas,
+    .maplibregl-canvas-container {
+      touch-action: none;
+      overscroll-behavior: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
     .hud {
       position: absolute;
       top: 18px;
@@ -598,6 +607,7 @@ const html = `<!doctype html>
       .name { font-size: 15px; }
       .meta { font-size: 11px; }
       .detail { display: none; }
+      .marker { pointer-events: none; }
     }
     @media (max-width: 420px) {
       .app { grid-template-rows: minmax(320px, 54dvh) minmax(280px, 1fr); }
