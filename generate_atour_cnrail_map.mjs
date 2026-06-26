@@ -152,7 +152,6 @@ const cnrailStyle = {
       tiles: ["./cnrail_tiles/{z}/{x}/{y}.pbf"],
       minzoom: 1,
       maxzoom: 8,
-      attribution: "Rail data style inspired by cnrail.geogv.org / WTRANS2, OpenStreetMap contributors",
     },
   },
   layers: [
@@ -178,7 +177,7 @@ const html = `<!doctype html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>亚朵酒店覆盖城市 × 中国铁路精细底图</title>
+  <title>中国铁路/亚朵城市</title>
   <link rel="stylesheet" href="./vendor/maplibre-gl.css">
   <style>
     :root {
@@ -205,7 +204,13 @@ const html = `<!doctype html>
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "STHeiti", "Microsoft YaHei", sans-serif;
       overflow: hidden;
     }
-    .app { display: grid; grid-template-columns: minmax(0, 1fr) 380px; background: #eef1eb; }
+    .app {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      background: #eef1eb;
+      transition: grid-template-columns .22s ease, grid-template-rows .22s ease;
+    }
+    .app.side-collapsed { grid-template-columns: minmax(0, 1fr) 58px; }
     .map-shell { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
     .hud {
       position: absolute;
@@ -225,18 +230,30 @@ const html = `<!doctype html>
       box-shadow: var(--shadow);
       pointer-events: auto;
     }
-    .title { padding: 14px 18px 12px; }
+    .title {
+      padding: 0;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
     h1 { margin: 0 0 6px; font-size: 25px; line-height: 1.15; letter-spacing: 0; }
     .subtitle { color: var(--muted); font-size: 13px; line-height: 1.45; }
     .legend {
-      padding: 10px 12px;
+      padding: 0;
       display: flex;
       gap: 12px;
       align-items: center;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      overflow-x: auto;
       font-size: 12px;
       color: #394842;
+      scrollbar-width: none;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
     }
+    .legend::-webkit-scrollbar { display: none; }
+    .legend span { flex: 0 0 auto; }
     .legend i {
       display: inline-block;
       vertical-align: middle;
@@ -250,10 +267,40 @@ const html = `<!doctype html>
       bottom: 18px;
       z-index: 3;
       width: 360px;
-      padding: 12px;
+      padding: 8px;
     }
-    .controls-summary { display: none; }
+    .controls:not([open]) {
+      width: 50px;
+      padding: 4px;
+    }
+    .controls:not([open]) .controls-summary {
+      justify-content: center;
+      min-height: 24px;
+      gap: 0;
+    }
+    .controls-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 30px;
+      gap: 10px;
+      color: #26352e;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      list-style: none;
+    }
+    .controls-summary::-webkit-details-marker { display: none; }
+    .controls-summary::after {
+      content: "展开";
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .controls[open] .controls-summary::after { content: "收起"; }
+    .controls:not([open]) .controls-summary::after { display: none; }
     .controls-body { display: block; }
+    .controls[open] .controls-body { margin-top: 7px; }
     .rail-toggles {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -288,21 +335,21 @@ const html = `<!doctype html>
       cursor: pointer;
     }
     .marker.hub {
-      width: 19px;
-      height: 19px;
-      border-radius: 6px;
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
       background: var(--red);
     }
     .marker.minor {
-      width: 12px;
-      height: 12px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background: var(--blue);
     }
     .marker.selected { outline: 3px solid rgba(30,43,37,.78); }
     .marker-label {
       position: absolute;
-      left: 16px;
+      left: 11px;
       top: -14px;
       white-space: nowrap;
       color: #172820;
@@ -318,6 +365,58 @@ const html = `<!doctype html>
       background: rgba(250,252,249,.97);
       padding: 22px 18px;
       overflow: auto;
+    }
+    .side-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .side-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #26352e;
+    }
+    .side-toggle {
+      flex: 0 0 auto;
+      border: 1px solid #c7d4ca;
+      border-radius: 6px;
+      background: #fff;
+      color: #26352e;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      min-height: 32px;
+      padding: 6px 10px;
+    }
+    .side-toggle:hover { background: #eef5ef; }
+    .side-toggle:focus-visible {
+      outline: 2px solid rgba(33,134,83,.42);
+      outline-offset: 2px;
+    }
+    .app.side-collapsed .side {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 10px 8px;
+      overflow: hidden;
+    }
+    .app.side-collapsed .side-header {
+      margin: 0;
+      width: 100%;
+    }
+    .app.side-collapsed .side-title,
+    .app.side-collapsed .side-body,
+    .app.side-collapsed .detail {
+      display: none;
+    }
+    .app.side-collapsed .side-toggle {
+      width: 100%;
+      min-height: 100%;
+      padding: 6px 4px;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
     }
     .search {
       width: 100%;
@@ -380,7 +479,6 @@ const html = `<!doctype html>
       line-height: 1.65;
       box-shadow: 0 8px 24px rgba(31,45,37,.08);
     }
-    .maplibregl-ctrl-attrib { font-size: 11px; }
     .map-error {
       display: none;
       position: absolute;
@@ -398,27 +496,20 @@ const html = `<!doctype html>
     }
     @media (max-width: 900px), (pointer: coarse) and (max-height: 520px) {
       .app { grid-template-columns: 1fr; grid-template-rows: minmax(330px, 56dvh) minmax(280px, 1fr); }
+      .app.side-collapsed { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) calc(52px + var(--safe-bottom)); }
       .hud {
         top: calc(8px + var(--safe-top));
         left: calc(8px + var(--safe-left));
-        right: calc(8px + var(--safe-right));
         gap: 6px;
-        max-width: none;
+        right: auto;
+        max-width: calc(100% - 16px - var(--safe-left) - var(--safe-right));
       }
-      .title { padding: 9px 11px; }
       h1 { font-size: 18px; line-height: 1.2; }
-      .subtitle { display: none; }
       .legend {
-        max-width: 100%;
-        flex-wrap: nowrap;
         gap: 10px;
-        overflow-x: auto;
-        padding: 7px 9px;
         font-size: 11px;
-        scrollbar-width: none;
+        max-width: calc(100vw - 16px - var(--safe-left) - var(--safe-right));
       }
-      .legend::-webkit-scrollbar { display: none; }
-      .legend span { flex: 0 0 auto; }
       .dot { width: 8px; height: 8px; }
       .sample-line { width: 18px; border-top-width: 2px; }
       .controls {
@@ -428,34 +519,7 @@ const html = `<!doctype html>
         width: auto;
         padding: 7px;
       }
-      .controls:not([open]) {
-        right: auto;
-        width: 104px;
-      }
-      .controls-summary {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        min-height: 30px;
-        gap: 10px;
-        color: #26352e;
-        cursor: pointer;
-        font-size: 12px;
-        font-weight: 700;
-        list-style: none;
-      }
-      .controls-summary::-webkit-details-marker { display: none; }
-      .controls-summary::after {
-        content: "展开";
-        color: var(--muted);
-        font-size: 11px;
-        font-weight: 600;
-      }
-      .controls[open] .controls-summary::after { content: "收起"; }
-      .controls:not([open]) .controls-summary::after { display: none; }
-      .controls[open] .controls-body {
-        margin-top: 7px;
-      }
+      .controls:not([open]) { right: auto; width: 48px; padding: 4px; }
       .rail-toggles {
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 6px;
@@ -479,6 +543,23 @@ const html = `<!doctype html>
         border-left: 0;
         border-top: 1px solid #d8e0da;
         padding: 12px 12px calc(18px + var(--safe-bottom));
+      }
+      .side-header { margin-bottom: 10px; }
+      .side-title { font-size: 14px; }
+      .side-toggle { min-height: 30px; padding: 5px 9px; }
+      .app.side-collapsed .side {
+        display: block;
+        padding: 8px 10px calc(8px + var(--safe-bottom));
+      }
+      .app.side-collapsed .side-header {
+        height: 100%;
+        margin: 0;
+      }
+      .app.side-collapsed .side-toggle {
+        width: 100%;
+        min-height: 36px;
+        height: 100%;
+        writing-mode: horizontal-tb;
       }
       .search { height: 38px; font-size: 13px; }
       .filters, .regions {
@@ -506,13 +587,16 @@ const html = `<!doctype html>
     @media (max-width: 420px) {
       .app { grid-template-rows: minmax(320px, 54dvh) minmax(280px, 1fr); }
       h1 { font-size: 16px; }
-      .legend { font-size: 10px; }
+      .legend { gap: 6px; font-size: 9px; }
+      .legend i { margin-right: 3px; }
+      .sample-line { width: 12px; }
       .rail-toggles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .maplibregl-ctrl-top-right { top: 78px; }
     }
     @media (max-height: 520px) and (orientation: landscape) {
       .app { grid-template-columns: minmax(0, 1fr) minmax(300px, 36vw); grid-template-rows: 1fr; }
-      .legend { display: none; }
+      .app.side-collapsed { grid-template-columns: minmax(0, 1fr) 58px; grid-template-rows: 1fr; }
+      .legend { max-width: min(720px, calc(100vw - 24px)); }
       .controls { max-width: 330px; }
       .side { border-top: 0; border-left: 1px solid #d8e0da; }
     }
@@ -525,20 +609,17 @@ const html = `<!doctype html>
       <div id="mapError" class="map-error">铁路底图需要浏览器启用 WebGL。当前环境无法初始化 MapLibre，因此仅显示右侧城市列表；请在普通 Chrome/Safari/Edge 浏览器中打开以查看精细铁路底图。</div>
       <div class="hud">
         <div class="title panel">
-          <h1>亚朵酒店覆盖城市 × 中国铁路精细底图</h1>
-          <div class="subtitle">共 ${total} 个检出城市；10+ 强覆盖 ${hubs} 个；铁路底图使用 cnrail/WTRANS2 矢量瓦片缓存，按 HSR、RR、R、F/其他、在建分类显示。</div>
+          <h1>中国铁路/亚朵城市</h1>
         </div>
         <div class="legend panel">
-          <span><i class="dot" style="background:var(--red)"></i>10+ 强覆盖</span>
-          <span><i class="dot" style="background:var(--blue)"></i>1-9 检出</span>
-          <span><i class="sample-line" style="border-color:#ef2f21"></i>HSR 高速铁路</span>
-          <span><i class="sample-line" style="border-color:#f08a00"></i>RR 快速/动车通道</span>
-          <span><i class="sample-line" style="border-color:#209a3b"></i>R 普速铁路</span>
+          <span><i class="sample-line" style="border-color:#ef2f21"></i>HSR 高铁</span>
+          <span><i class="sample-line" style="border-color:#f08a00"></i>RR 动车</span>
+          <span><i class="sample-line" style="border-color:#209a3b"></i>R 普铁</span>
           <span><i class="sample-line" style="border-color:#86a800"></i>F/其他</span>
         </div>
       </div>
-      <details class="controls panel" open>
-        <summary class="controls-summary">图层</summary>
+      <details class="controls panel">
+        <summary class="controls-summary">选项</summary>
         <div class="controls-body">
           <div class="rail-toggles" id="railToggles">
             <label><input type="checkbox" value="hsr" checked>HSR 高速</label>
@@ -553,16 +634,22 @@ const html = `<!doctype html>
       </details>
     </section>
     <aside class="side">
-      <input id="search" class="search" placeholder="搜索城市、省份、区域或样例门店" autocomplete="off">
-      <div class="filters">
-        <button class="chip active" data-scope="all">全部 ${total}</button>
-        <button class="chip" data-scope="hub">10+ 强覆盖 ${hubs}</button>
-        <button class="chip" data-scope="minor">1-9 城市 ${total - hubs}</button>
+      <div class="side-header">
+        <div class="side-title">城市列表</div>
+        <button id="sideToggle" class="side-toggle" type="button" aria-expanded="true">收起</button>
       </div>
-      <div class="regions" id="regions"></div>
-      <div class="result-meta" id="resultMeta"></div>
-      <div class="list" id="list"></div>
-      <div class="detail" id="detail">选择城市后显示覆盖等级和样例门店。铁路底图直接来自 cnrail/WTRANS2 矢量线网缓存，分类遵循其线路 type 字段；不代表 12306 当日车次。</div>
+      <div class="side-body">
+        <input id="search" class="search" placeholder="搜索城市、省份、区域或样例门店" autocomplete="off">
+        <div class="filters">
+          <button class="chip active" data-scope="all">全部 ${total}</button>
+          <button class="chip" data-scope="hub">10+ 强覆盖 ${hubs}</button>
+          <button class="chip" data-scope="minor">1-9 城市 ${total - hubs}</button>
+        </div>
+        <div class="regions" id="regions"></div>
+        <div class="result-meta" id="resultMeta"></div>
+        <div class="list" id="list"></div>
+        <div class="detail" id="detail">选择城市后显示覆盖等级和样例门店。铁路底图直接来自 cnrail/WTRANS2 矢量线网缓存，分类遵循其线路 type 字段；不代表 12306 当日车次。</div>
+      </div>
     </aside>
   </main>
   <script src="./vendor/maplibre-gl.js"></script>
@@ -602,7 +689,6 @@ const html = `<!doctype html>
         attributionControl: false
       });
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
-      map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
     } catch (error) {
       const errorBox = document.getElementById("mapError");
       errorBox.textContent = "铁路底图初始化失败：" + (error && error.message ? error.message : String(error));
@@ -618,33 +704,37 @@ const html = `<!doctype html>
     const railToggles = document.getElementById("railToggles");
     const mapError = document.getElementById("mapError");
     const controlsPanel = document.querySelector(".controls");
-    let syncingControlsPanel = false;
-    let controlsPanelTouched = false;
+    const appShell = document.querySelector(".app");
+    const sideToggle = document.getElementById("sideToggle");
 
     if (!map) {
       mapError.style.display = "block";
     }
-    if (controlsPanel) {
-      controlsPanel.addEventListener("toggle", () => {
-        if (!syncingControlsPanel) controlsPanelTouched = true;
+    function resizeMapSoon() {
+      if (!map) return;
+      window.requestAnimationFrame(() => {
+        map.resize();
+        renderMarkers();
+        window.setTimeout(() => {
+          map.resize();
+          renderMarkers();
+        }, 240);
       });
     }
+    function setSideCollapsed(collapsed) {
+      appShell.classList.toggle("side-collapsed", collapsed);
+      sideToggle.setAttribute("aria-expanded", String(!collapsed));
+      sideToggle.textContent = collapsed ? "展开城市列表" : "收起";
+      resizeMapSoon();
+    }
+    sideToggle.addEventListener("click", () => {
+      setSideCollapsed(!appShell.classList.contains("side-collapsed"));
+    });
 
     function refreshResponsiveState() {
       const compact = compactQuery.matches;
       document.documentElement.dataset.device = compact ? "compact" : "wide";
-      if (controlsPanel && !controlsPanelTouched) {
-        const collapseControls = compact && window.innerWidth <= 520 && window.innerHeight >= window.innerWidth;
-        if (controlsPanel.open === collapseControls) {
-          syncingControlsPanel = true;
-          controlsPanel.open = !collapseControls;
-          window.setTimeout(() => { syncingControlsPanel = false; }, 0);
-        }
-      }
-      if (map) window.requestAnimationFrame(() => {
-        map.resize();
-        renderMarkers();
-      });
+      resizeMapSoon();
     }
     function escapeHtml(value) {
       return String(value)

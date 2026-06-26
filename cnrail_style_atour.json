@@ -8,8 +8,7 @@
         "./cnrail_tiles/{z}/{x}/{y}.pbf"
       ],
       "minzoom": 1,
-      "maxzoom": 8,
-      "attribution": "Rail data style inspired by cnrail.geogv.org / WTRANS2, OpenStreetMap contributors"
+      "maxzoom": 8
     }
   },
   "layers": [
